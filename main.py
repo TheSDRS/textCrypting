@@ -1,1 +1,4 @@
-print("Hello World")
+import text
+
+print(text.getAlphabet("lower"))
+print(text.getAlphabet("upper"))
