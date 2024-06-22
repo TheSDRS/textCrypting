@@ -1,3 +1,10 @@
-import text
+import userInput
 
-text.genCryptikKey(15)
+
+def main():
+    while True:
+        userInput.waitForInput()
+
+
+if __name__ == '__main__':
+    main()
