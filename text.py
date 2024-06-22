@@ -1,3 +1,5 @@
+import util
+
 cryptKeyU = []
 cryptKeyL = []
 
@@ -19,39 +21,40 @@ def getAlphabet(case: str) -> str:
 
 
 # Function to generate a new encrypted alphabet
-def genCryptikKey(offset: int):
+def genCrypticKey(offset: int):
     # Getting the alphabets
-    tmpListL = getAlphabet("upper")
-    tmpListS = getAlphabet("lower")
+    tmpListL = getAlphabet("lower")
 
     # Looping 'offset' times
     for i in range(offset):
 
         # Getting current first letter in the half encrypted alphabet
         currentFirstLetterL = tmpListL[0]
-        currentFirstLetterS = tmpListS[0]
 
         # Looping through the half encrypted alphabet
         for l in range(1, len(tmpListL)):
 
             # As 'l' is the current location in the alphabet Array we need to set the 'l - 1' letter to the 'l' letter
             tmpListL[l - 1] = tmpListL[l]
-            tmpListS[l - 1] = tmpListS[l]
 
             # Checking if the 'l' letter is the last letter in the list
             if l == len(tmpListL) - 1:
                 # Setting last letter to the earlier saved first letter
                 tmpListL[l] = currentFirstLetterL
-                tmpListS[l] = currentFirstLetterS
+
+    # just making all letters upper case and adding them to the upper case list
+    tmpListU = []
+    for letter in tmpListL:
+        tmpListU.append(letter.capitalize())
 
     # Setting the global encryption key lists
     global cryptKeyU
     global cryptKeyL
-    cryptKeyU = tmpListL
-    cryptKeyL = tmpListS
+    cryptKeyU = tmpListU
+    cryptKeyL = tmpListL
 
 
-def encryptCaesar(plainText: str) -> str:
+def encrypt(plainText: str) -> str:
     encryptedText = ""
 
     for letter in plainText:
@@ -65,7 +68,7 @@ def encryptCaesar(plainText: str) -> str:
     return encryptedText
 
 
-def decryptCaesar(encryptedText: str) -> str:
+def decrypt(encryptedText: str) -> str:
     decryptedText = ""
 
     for letter in encryptedText:
@@ -77,3 +80,20 @@ def decryptCaesar(encryptedText: str) -> str:
             decryptedText = decryptedText + letter
 
     return decryptedText
+
+
+def decryptAuto(encryptedText: str) -> dict:
+    decryptionOptions = []
+    for i in range(1, 26):
+        genCrypticKey(i)
+        decryptionOptions.append(decrypt(encryptedText))
+
+    scores = []
+    for text in decryptionOptions:
+        scores.append(util.checkWords(text))
+
+    optionDictionary = {}
+    for i in range(0, 25):
+        optionDictionary[decryptionOptions[i]] = scores[i]
+
+    return util.sortDict(optionDictionary)

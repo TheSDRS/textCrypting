@@ -5,11 +5,16 @@ import util
 
 
 def waitForInput():
+    # cmd is the command th user entered with all arguments
     cmd = input("Please enter command (case lower): ")
 
+    # managing witch command does what
     if cmd == "exit":
+        # using the 'sys' library to exit the programme
         sys.exit()
     elif cmd.startswith("encrypt"):
+        # when the 'encrypt' command is called the sub handler function 'encrypt' is called
+        # to make things easier the first argument gets removed beforehand
         args = cmd.removeprefix("encrypt")
         encrypt(args)
     elif cmd.startswith("setkey"):
@@ -21,19 +26,12 @@ def waitForInput():
     elif cmd.startswith("getkeys"):
         print("Cryptic key upper: " + str(text.cryptKeyU))
         print("Cryptic key lower: " + str(text.cryptKeyL))
+    elif cmd.startswith("generatekey"):
+        print("Generated new Cryptic Key: \n" + str(util.generateKey()))
     elif cmd.startswith("help"):
-        print("'exit': exit the program")
-        print("'encrypt': ")
-        print("     usage: encrypt [text|file] [textToEncrypt|fileToEncrypt]")
-        print("     action: encrypts the given text or file")
-        print("'setkey': ")
-        print("     usage: setkey [offset|custom] [offset|customKey]")
-        print("     action: set's the encryption and decryption keys")
-        print("'decrypt': ")
-        print("     usage: decrypt [text|file] [textToDecrypt|fileToDecrypt]")
-        print("     action: decrypts the given text or file")
-        print("'getkeys': returns the current  encryption and decryption keys")
-        print("'help': prints this help text")
+        util.printHelp()
+    else:
+        util.printHelp()
 
 
 def encrypt(args: str):
@@ -43,32 +41,33 @@ def encrypt(args: str):
         args = args.removeprefix(" ")
         if args.startswith("text"):
             args = args.removeprefix("text")
-            caesarText(args)
+            encryptText(args)
         elif args.startswith("file"):
             args = args.removeprefix("file")
-            caesarFile(args)
+            encryptFile(args)
 
 
-def caesarText(args: str):
+def encryptText(args: str):
     if args == "" or args is None or len(args) == 0:
-        print("Please use 'encrypt caesar text [text]'")
+        print("Please use 'encrypt text [text]'")
     else:
         args = args.removeprefix(" ")
         textToEncrypt = util.stripText(args)
-        print("Encrypted Text: \n" + text.encryptCaesar(textToEncrypt))
+        encryptedText = text.encrypt(textToEncrypt)
+        util.genOutputFile(encryptedText, True)
+        print("Encrypted Text: \n" + encryptedText)
 
 
-def caesarFile(args: str):
+def encryptFile(args: str):
     if args == "" or args is None or len(args) == 0:
-        print("Please use 'encrypt caesar file [Path to file]'")
+        print("Please use 'encrypt file [Path to file]'")
     else:
         args = args.removeprefix(" ")
         filePath = util.stripText(args)
         file = open(filePath, "r")
         textToEncrypt = file.read()
-        encryptedText = text.encryptCaesar(textToEncrypt)
-        encryptedFile = open("outputEncrypted.txt", "w")
-        encryptedFile.write(encryptedText)
+        encryptedText = text.encrypt(textToEncrypt)
+        util.genOutputFile(encryptedText, True)
         print("Encrypted Text: \n" + encryptedText)
 
 
@@ -128,7 +127,7 @@ def setKeyOffset(args: str):
         print("Please use 'setkey offset [offset]'")
     else:
         args = args.removeprefix(" ")
-        text.genCryptikKey(int(args))
+        text.genCrypticKey(int(args))
         print("generated an Cryptic key with an offset of '" + args + "'")
         print("Cryptic key upper: " + str(text.cryptKeyU))
         print("Cryptic key lower: " + str(text.cryptKeyL))
@@ -152,9 +151,24 @@ def decryptText(args: str):
         print("Please use 'decrypt text [text]'")
     else:
         args = args.removeprefix(" ")
-        textToDecrypt = util.stripText(args)
-        decryptedText = text.decryptCaesar(textToDecrypt)
-        print("Decrypted text: \n" + decryptedText)
+        if args.endswith("-a"):
+            args = args.removesuffix(" -a")
+            textToDecrypt = util.stripText(args)
+            options = text.decryptAuto(textToDecrypt)
+            print("Tried to decrypt: \n")
+            i = 1
+            for key in options.keys():
+                if i < 2:
+                    util.genOutputFile(key, False)
+                    print(key)
+                else:
+                    break
+
+        else:
+            textToDecrypt = util.stripText(args)
+            decryptedText = text.decrypt(textToDecrypt)
+            util.genOutputFile(decryptedText, False)
+            print("Decrypted text: \n" + decryptedText)
 
 
 def decryptFile(args: str):
@@ -162,10 +176,23 @@ def decryptFile(args: str):
         print("Please use 'decrypt file [Path to file]'")
     else:
         args = args.removeprefix(" ")
-        filePath = util.stripText(args)
-        file = open(filePath, "r")
-        textToDecrypt = file.read()
-        decryptedText = text.decryptCaesar(textToDecrypt)
-        decryptedFile = open("outputDecrypted.txt", "w")
-        decryptedFile.write(decryptedText)
-        print("Decrypted text: \n" + decryptedText)
+        if args.endswith("-a"):
+            args = args.removesuffix(" -a")
+            filePath = util.stripText(args)
+            file = open(filePath, "r")
+            textToDecrypt = file.read()
+            options = text.decryptAuto(textToDecrypt)
+            print("Tried to decrypt: \n")
+            i = 1
+            for key in options.keys():
+                if i < 2:
+                    util.genOutputFile(key, False)
+                    print(key)
+                    i += 1
+        else:
+            filePath = util.stripText(args)
+            file = open(filePath, "r")
+            textToDecrypt = file.read()
+            decryptedText = text.decrypt(textToDecrypt)
+            util.genOutputFile(decryptedText, False)
+            print("Decrypted text: \n" + decryptedText)
