@@ -315,13 +315,19 @@ def decryptFile(args: str):
                 print("File " + filePath + " was not found.")
 
 
+# this function manages the bruteForce command
 def bruteForceDecrypt(args: str):
     # checking for arguments
     if args == "" or args is None or len(args) == 0:
+        # printing some user feedback
         print("Please use 'bruteforce [text]'")
     else:
+        # removing some useless char
         args = args.removeprefix(" ")
+        # getting the text to decrypt
         textToDecrypt = util.stripText(args)
+        # printing some more user feedback
         print("Brute forcing decryption of '" + textToDecrypt + "'")
 
+        # attempting brute forcing the text
         text.decryptBruteForce(textToDecrypt)

@@ -166,43 +166,73 @@ bestDecryptedText = ""
 
 
 def bruteForceDecrypt(currentKey: str, currentLetter: str, textToDecrypt: str):
+    # getting some variables
     global bestScore, bestKey, bestDecryptedText
+    # checking if some other thread found the right combination
     if text.isDecrypted.isSet():
+        # closing current thread
         threading.current_thread().join()
     else:
+        # adding the current letter to the current key
         currentKey = currentKey + currentLetter
+        # checking if the currentKey is finished
         if len(currentKey) == 26:
+            # setting the cryptik keys up for decrypting
             text.cryptKeyU = []
             text.cryptKeyL = []
             for letter in currentKey:
                 text.cryptKeyU.append(letter)
                 text.cryptKeyL.append(letter.lower())
+            # decrypting the text
             decryptedText = text.decrypt(textToDecrypt)
+            # generating a score based on the result
             score = checkWords(decryptedText)
+            # adding the current combination to a shared list
             text.triedCombinations.put(currentKey)
+            # checking if the calculated score is an improvement
             if score > bestScore:
+                # setting the best score to the current score
                 bestScore = score
+                # setting the best key to the current key
                 bestKey = currentKey
+                # setting the best decrypted tex to the current decrypted text
                 bestDecryptedText = decryptedText
+                # printing some user feedback
                 print("Current Key: " + str(currentKey) + ", Best Score: " + str(bestScore) + ", Decrypted Text: " + str(bestDecryptedText))
         else:
+            # looping through the upper case alphabet
             for letter in text.getAlphabet("upper"):
+                # checking if letter is already in the current key
                 if letter not in currentKey:
+                    # creating a new thread with this function
                     thread = threading.Thread(target=bruteForceDecrypt, args=(currentKey, letter, textToDecrypt))
+                    # running the thread
                     thread.start()
+                    # if the thread finishes it gets joined into the main thread if I understood this correctly
                     thread.join()
 
 
+# function for counting time and threads
 def countThreads(arg: str):
+    # getting the current time in seconds
     t1 = math.floor(time.time())
     prvDiff = 0
     diff = 0
+    # looping as long the application/thread is running
     while True:
+        # getting the time difference
         t = math.floor(time.time() - t1)
+        # checking if the current time in seconds is the previous time
         if not t == prvDiff:
+            # setting the previous difference to the current difference
             prvDiff = t
+            # adding one to the difference variable
             diff += 1
+        # checking if the difference variable is 60 aka waiting 60 seconds
         if diff == 60:
+            # printing some user feedback
+            # like the current time it took and the current thread count and tried combinations
             print("Time in Seconds: " + str(t) + ", Thread Count: " + str(threading.active_count())
                   + ", Tried Combinations: " + str(text.triedCombinations.qsize()))
+            # resetting the difference Variable
             diff = 0

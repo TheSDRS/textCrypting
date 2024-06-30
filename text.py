@@ -116,13 +116,22 @@ isDecrypted = threading.Event()
 triedCombinations = Queue()
 
 
+# function for brute force decrypting a text
 def decryptBruteForce(encryptedText: str):
+    # creating a new thread in which a time counter runs
     counter = threading.Thread(target=util.countThreads, args=("lol",))
+    # starting the thread
     counter.start()
 
+    # looping through all letters of the upper case alphabet
     for letter in getAlphabet("upper"):
+        # creating a new thread for each letter
+        # in the thread runs a recursive function to try every possible combination
         thread = threading.Thread(target=util.bruteForceDecrypt, args=("", letter, encryptedText))
+        # starting the thread
         thread.start()
+        # if the thread finishes the thread will be joined into the main thread if I understood this correctly
         thread.join()
 
+    # if the for loop finishes the counter thread will be joined into the main thread if I understood this correctly
     counter.join()
