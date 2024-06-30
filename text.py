@@ -1,5 +1,3 @@
-import itertools
-import sys
 import threading
 from multiprocessing import Queue
 
@@ -30,36 +28,10 @@ def getAlphabet(case: str) -> str:
 
 # Function to generate a new encrypted alphabet
 def genCrypticKey(offset: int):
-    # Getting the alphabets
-    tmpListL = getAlphabet("lower")
-
-    # Looping 'offset' times
-    for i in range(offset):
-
-        # Getting current first letter in the half encrypted alphabet
-        currentFirstLetterL = tmpListL[0]
-
-        # Looping through the half encrypted alphabet
-        for l in range(1, len(tmpListL)):
-
-            # As 'l' is the current location in the alphabet Array we need to set the 'l - 1' letter to the 'l' letter
-            tmpListL[l - 1] = tmpListL[l]
-
-            # Checking if the 'l' letter is the last letter in the list
-            if l == len(tmpListL) - 1:
-                # Setting last letter to the earlier saved first letter
-                tmpListL[l] = currentFirstLetterL
-
-    # just making all letters upper case and adding them to the upper case list
-    tmpListU = []
-    for letter in tmpListL:
-        tmpListU.append(letter.capitalize())
-
     # Setting the global encryption key lists
     global cryptKeyU
     global cryptKeyL
-    cryptKeyU = tmpListU
-    cryptKeyL = tmpListL
+    cryptKeyU, cryptKeyL = util.genKeyOffset(offset)
 
 
 # function to encrypt the given text with the given Cryptic key

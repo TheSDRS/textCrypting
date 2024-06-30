@@ -1,6 +1,4 @@
-import text
 import userInput
-import util
 
 
 # Main function of the project

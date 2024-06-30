@@ -40,6 +40,37 @@ def generateKey() -> list:
     return key
 
 
+# Function to generate a new encrypted alphabet
+def genKeyOffset(offset: int):
+    # Getting the alphabets
+    tmpListL = text.getAlphabet("lower")
+
+    # Looping 'offset' times
+    for i in range(offset):
+
+        # Getting current first letter in the half encrypted alphabet
+        currentFirstLetterL = tmpListL[0]
+
+        # Looping through the half encrypted alphabet
+        for l in range(1, len(tmpListL)):
+
+            # As 'l' is the current location in the alphabet Array we need to set the 'l - 1' letter to the 'l' letter
+            tmpListL[l - 1] = tmpListL[l]
+
+            # Checking if the 'l' letter is the last letter in the list
+            if l == len(tmpListL) - 1:
+                # Setting last letter to the earlier saved first letter
+                tmpListL[l] = currentFirstLetterL
+
+    # just making all letters upper case and adding them to the upper case list
+    tmpListU = []
+    for letter in tmpListL:
+        tmpListU.append(letter.capitalize())
+
+    # Returning the global encryption key lists
+    return tmpListU, tmpListL
+
+
 # this function calculates a score based on the words
 def checkWords(text: str) -> float:
     # the score is calculated by checking if a word is in a large list of german words
